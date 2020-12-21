@@ -4,17 +4,20 @@ const bodyParser = require('body-parser');
 var mailer = require("nodemailer");
 const helmet = require('helmet');
 const compression = require('compression');
+const pool = require('./db');
+
 
 //giving email authentication
-process.env.NODE_TLS_REJECT_UNAUTHORIZED='0'
+process.env.NODE_TLS_REJECT_UNAUTHORIZED='0';
+
 
 
 // Use Smtp Protocol to send Email
 var smtpTransport = mailer.createTransport({
     service: "Gmail",
     auth: {
-        user: `${"ahiresiddhant55@gmail.com" ||process.env.EMAIL_ID}`,
-        pass: `${"8286262736" || process.env.EMAIL_PASSWORD}`
+        user: `${process.env.EMAIL_ID}`,
+        pass: `${process.env.EMAIL_PASSWORD}`
     }
 });
 const app = express();
@@ -30,27 +33,60 @@ app.use((req,res,next)=>{
     next();
 });
 // Adding Email sending model
+
+const test = async()=>{
+    try {
+         
+         const newUser = await pool.query(
+             "INSERT INTO users (name,dob,email) VALUES ($1,$2,$3) RETURNING *",
+             ['siddhant','1998-02-02','siddhant@gmail.com']
+         )
+        
+    }
+    catch(error){
+        console.log(error);
+    }
+}
+test(); 
+
 app.post('/email',((req,res,next)=>{
     const name = req.body.name;
     const email = req.body.email;
     const dob = req.body.dob;
-    message="happy birthday"
-    console.log(name,email,dob)
+    message="happy birthday";
+    console.log(name,email,dob);
     var mail = {
         from: email,
-        to: "ahiresiddhant000@gmail.com",
-        subject: "siddhantahireofficial.github.io",
+        to: `${email}`,
+        subject: `${name} Happy Birthday`,
         text: "new responce",
         html: `
-          <p>Message:${message}</p></br>Name:<p>${name}</p> `
+          <h3>${message} ${name}</h3>
+          <p> Name: ${name} </p>
+          <p> dob: ${dob} </p>`
     }
     smtpTransport.sendMail(mail, function(error, response){
       if(error){
           console.log(error)
-          return res.redirect('https://siddhant-ahire.github.io/error.html');
+          return res.status(200).json({message:"error:",success:false});
       }else{
+
+        const test = async()=>{
+            try {
+                 
+                 const newUser = await pool.query(
+                     "INSERT INTO users (name,dob,email) VALUES ($1,$2,$3) RETURNING *",
+                     [name,dob,email]
+                 )
+                
+            }
+            catch(error){
+                console.log(error);
+            }
+        }
+        test();        
           smtpTransport.close();
-          return res.status(200).json({name:name});
+          return res.status(200).json({message:"Data submited Successfully",success:true});
       }
     });
 })
