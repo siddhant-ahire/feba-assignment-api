@@ -1,4 +1,4 @@
-CREATE DATABASE feba-assignment;
+-- CREATE DATABASE feba-assignment;
 
 create table users(
     id SERIAL PRIMARY KEY,
