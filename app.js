@@ -34,20 +34,6 @@ app.use((req,res,next)=>{
 });
 // Adding Email sending model
 
-const test = async()=>{
-    try {
-         
-         const newUser = await pool.query(
-             "INSERT INTO users (name,dob,email) VALUES ($1,$2,$3) RETURNING *",
-             ['siddhant','1998-02-02','siddhant@gmail.com']
-         )
-        
-    }
-    catch(error){
-        console.log(error);
-    }
-}
-test(); 
 
 app.post('/email',((req,res,next)=>{
     const name = req.body.name;
